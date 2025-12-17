@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The EvenTopia</title>
+    <link rel="stylesheet" href="./style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-left">
+          <div class="user-info" id="userInfo" style="display: none">
+            <img id="userPic" src="" alt="User" class="user-avatar" />
+            <span id="username" class="username"></span>
+          </div>
+          <div class="logo">
+            <i class="fas fa-calendar-alt"></i>
+            <span>EvenTopia</span>
+          </div>
+        </div>
+        <div class="nav-right">
+          <!-- <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+                <button class="btn btn-secondary" id="loginBtn">Login</button> -->
+          <button class="btn btn-danger" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+      <!-- Hero Section -->
+      <section class="hero">
+        <h1>Discover & Manage Events</h1>
+        <p>Create, book, and manage your events all in one place</p>
+      </section>
+
+      <!-- Create Event Section -->
+      <section class="create-event-section" id="createEventSection">
+        <div class="card">
+          <h2><i class="fas fa-plus-circle"></i> Create New Event</h2>
+          <form id="createEventForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="eventTitle">Event Title</label>
+                <input type="text" id="eventTitle" required />
+              </div>
+              <div class="form-group">
+                <label for="eventDate">Date</label>
+                <input type="date" id="eventDate" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="eventTime">Time</label>
+                <input type="time" id="eventTime" required />
+              </div>
+              <div class="form-group">
+                <label for="eventLocation">Location</label>
+                <input type="text" id="eventLocation" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="eventDescription">Description</label>
+              <textarea id="eventDescription" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="eventImage">Image URL (optional)</label>
+              <input
+                type="url"
+                id="eventImage"
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              <i class="fas fa-calendar-plus"></i> Create Event
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Events Grid -->
+      <section class="events-section">
+        <h2><i class="fas fa-calendar-week"></i> Available Events</h2>
+        <div class="events-grid" id="eventsGrid">
+          <div class="empty-state">
+            <i class="fas fa-calendar-times"></i>
+            <p>No events available. Create one to get started!</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- My Bookings Section -->
+      <section class="bookings-section" id="bookingsSection">
+        <h2><i class="fas fa-bookmark"></i> My Event Log</h2>
+        <div class="bookings-list" id="bookingsList">
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>You haven't booked any events yet.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Update Event Modal -->
+    <div id="updateEventModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="auth-container">
+          <h2>Update Event</h2>
+          <form id="updateEventForm">
+            <input type="hidden" id="updateEventId" />
+            <div class="form-group">
+              <label for="updateLocation">Location</label>
+              <input type="text" id="updateLocation" required />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="updateDate">Date</label>
+                <input type="date" id="updateDate" required />
+              </div>
+              <div class="form-group">
+                <label for="updateTime">Time</label>
+                <input type="time" id="updateTime" required />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              <i class="fas fa-save"></i> Update Event
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+</body>
+<script type="module">
+      // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAuj63e1bf_Xo0OhfqNIPdodgaF5BaeTJU",
+        authDomain: "eventopia-72d01.firebaseapp.com",
+        projectId: "eventopia-72d01",
+        storageBucket: "eventopia-72d01.firebasestorage.app",
+        messagingSenderId: "314849744152",
+        appId: "1:314849744152:web:1843a84ad2d7b6a7777a6d"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const colRef = collection(db, 'events');
+      const bookingsColRef = collection(db, 'bookings');
+      const auth = getAuth();
+
+      // navbar with signed-in user's name and photo
+      onAuthStateChanged(auth, (currentUser) => {
+        // console.log('onAuthStateChanged user:', currentUser);
+        if (currentUser) {
+          userInfo.style.display = 'flex';
+          const displayName = currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'User');
+          username.textContent = displayName;
+          userPic.alt = displayName;
+          userPic.onerror = () => { userPic.src = 'https://via.placeholder.com/40'; };
+          userPic.src =
+            currentUser.photoURL ||
+            'https://ui-avatars.com/api/?name=' + encodeURIComponent(displayName) + '&background=6366f1&color=fff';
+          userPic.style.display = 'block';
+        } else {
+          userInfo.style.display = 'none';
+        }
+      });
+
+      // DOM Elements
+
+    const photoUrlGroup = document.getElementById("photoUrlGroup");
+    const userInfo = document.getElementById("userInfo");
+    const username = document.getElementById("username");
+    const userPic = document.getElementById("userPic");
+    const createEventSection = document.getElementById("createEventSection");
+    const createEventForm = document.getElementById("createEventForm");
+    const eventsGrid = document.getElementById("eventsGrid");
+    const bookingsSection = document.getElementById("bookingsSection");
+    const bookingsList = document.getElementById("bookingsList");
+    const updateEventModal = document.getElementById("updateEventModal");
+    const updateEventForm = document.getElementById("updateEventForm");
+    const updateEventIdInput = document.getElementById("updateEventId");
+    const updateLocationInput = document.getElementById("updateLocation");
+    const updateDateInput = document.getElementById("updateDate");
+    const updateTimeInput = document.getElementById("updateTime");
+    let Events = [];
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    createEventForm.addEventListener("submit", async (e)=> {
+        e.preventDefault();
+
+        let eventTitle = document.getElementById("eventTitle").value;
+        let eventDate = document.getElementById("eventDate").value;
+        let eventTime = document.getElementById("eventTime").value;
+        let eventLocation = document.getElementById("eventLocation").value;
+        let eventDescription = document.getElementById("eventDescription").value;
+        let eventImage = document.getElementById("eventImage").value;
+
+        if(!eventTitle || !eventDate || !eventTime || !eventLocation) {
+            // alert("Please fill in all required fields.");
+            showNotification("Please fill in all required fields.", 'error')
+            return;
+        }
+        try {
+            const eventSnapShot = await addDoc(colRef, {
+                title: eventTitle,
+                date: eventDate,
+                time: eventTime,
+                location: eventLocation,
+                description: eventDescription,
+                imageUrl: eventImage || null,
+                createdAt: new Date()
+            });
+            // alert("Event created successfully!");
+            showNotification("Event created successfully!", 'success')
+            // Refresh events from Firestore
+            await renderEvents();
+        } catch (error) {
+          console.log(error.message);
+          showNotification("Failed to create event. See console.", 'error')
+          
+        }
+       // reset form
+       createEventForm.reset();
+    });
+
+    async function renderEvents() {
+        Events = []; // Clear the array first
+        try {
+          const querySnapshot = await getDocs(colRef);
+          querySnapshot.forEach((doc) => {
+            const data = { id: doc.id, ...doc.data() };
+            Events.push(data);
+          });
+        } catch (err) {
+          console.error('Error fetching events:', err);
+          showNotification('Error fetching events. See console.', 'error')
+        }
+        displayEvents();
+      }
+   function displayEvents() {
+      eventsGrid.innerHTML = "";
+      if (Events.length === 0) {
+        eventsGrid.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-calendar-times"></i>
+            <p>No events available.</p>
+          </div>
+        `;
+        return;
+      }
+
+      Events.forEach((event) =>{
+        const formattedDate = new Date(event.date).toLocaleDateString("en-US", {
+          weekday: "short",
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+
+        eventsGrid.innerHTML += `
+          <div class="event-card">
+            <img src="${event.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${event.title}" class="event-image" />
+            <div class="event-details">
+              <h3 class="event-title" style="color: #4CAF50; margin-left: 10px;">${event.title}</h3>
+              <p class="event-date-time" style="color: #4CAF50; margin-left: 10px;"><i class="fas fa-calendar"></i> ${formattedDate}</p>
+              <p class="event-time" style="color: #4CAF50; margin-left: 10px;"><i class="fas fa-clock"></i> ${event.time}</p>
+              <p class="event-location"><i class="fas fa-map-marker-alt" style="color: #4CAF50; margin-left: 10px;"></i> ${event.location}</p>
+              <p class="event-description" style="color: #4CAF50; margin-left: 10px; display: block;">${event.description || ''}</p>
+              <div style="margin-top: 10px; text-align: center; display: flex; gap:10px; justify-content:center;">
+                <button class="btn btn-secondary btn-block book-event-btn" onclick=ToBookEvent("${event.id}") style="width: 30%;"><i class="fas fa-bookmark" ></i> Book</button>
+                <button class="btn btn-secondary btn-block update-event-btn" onclick=ToUpdateEvent("${event.id}") style="width: 30%;"><i class="fas fa-edit" ></i> Edit</button>
+                <button class="btn btn-danger" onclick="deleteEvent('${event.id}')" style="width: 30%;"><i class="fas fa-trash"></i> Delete</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+      })
+    }
+
+    logoutBtn.addEventListener("click", async(e) => {
+      e.preventDefault();
+      try {
+        await auth.signOut();
+        showNotification("Logged out successfully", 'success');
+        window.location.href = "./index.html";
+      } catch (error) {
+        console.log(error.message);
+      }
+    })
+    renderEvents();
+
+    
+    window.ToUpdateEvent = function (eventId) {
+      const ev = Events.find((e) => e.id === eventId);
+      if (!ev) {
+        // alert('Event not found');
+        showNotification('Event not found', 'error')
+        return;
+      }
+      updateEventIdInput.value = ev.id;
+      updateLocationInput.value = ev.location || '';
+      updateDateInput.value = ev.date || '';
+      updateTimeInput.value = ev.time || '';
+      updateEventModal.style.display = 'flex';
+    }
+
+    // Modal close handlers
+    const modalClose = updateEventModal.querySelector('.close');
+    if (modalClose) modalClose.addEventListener('click', () => updateEventModal.style.display = 'none');
+    window.addEventListener('click', (e) => { if (e.target === updateEventModal) updateEventModal.style.display = 'none'; });
+
+    // Handle update form submit
+    updateEventForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = updateEventIdInput.value;
+      if (!id) return alert('No event selected');
+      try {
+        const eventRef = doc(db, 'events', id);
+        await updateDoc(eventRef, {
+          location: updateLocationInput.value,
+          date: updateDateInput.value,
+          time: updateTimeInput.value
+        });
+        // alert('Event updated successfully');
+        showNotification('Event updated successfully', 'success')
+        updateEventModal.style.display = 'none';
+        await renderEvents();
+      } catch (err) {
+        console.error('Update failed:', err);
+        // alert('Failed to update event. Check console.');
+        showNotification('Failed to update event. Check console.', 'error')
+      }
+    });
+
+    // Event Booking
+    window.ToBookEvent = async function (eventId) {
+      const ev = Events.find((e) => e.id === eventId);
+      if (!ev) {
+        // alert('Event not found');
+        showNotification('Event not found')
+        return;
+      }
+      try {
+        await addDoc(bookingsColRef, {
+          eventId: ev.id,
+          title: ev.title,
+          date: ev.date,
+          time: ev.time,
+          location: ev.location,
+          userId: auth.currentUser ? auth.currentUser.uid : null,
+          createdAt: new Date()
+        });
+        // alert('Event booked successfully!');
+        showNotification('Event booked successfully!', 'success')
+        await renderBookings();
+      } catch (err) {
+        console.error('Booking error:', err);
+        // alert('Failed to book event. See console.');
+        showNotification('Failed to book event. See console.', 'error')
+      }
+    }
+
+    // Render bookings list from `bookings` collection
+    async function renderBookings() {
+      bookingsList.innerHTML = '';
+      try {
+        const snapshot = await getDocs(bookingsColRef);
+        if (snapshot.empty) {
+          bookingsList.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <p>You haven't booked any events yet.</p>
+            </div>
+          `;
+          return;
+        }
+        snapshot.forEach((docSnap) => {
+          const b = { id: docSnap.id, ...docSnap.data() };
+          const formattedDate = b.date ? new Date(b.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+          bookingsList.innerHTML += `
+            <div class="booking-card">
+              <h3 class="booking-title">${b.title}</h3>
+              <p class="booking-date-time"><i class="fas fa-calendar"></i> ${formattedDate}</p>
+              <p class="booking-time"><i class="fas fa-clock"></i> ${b.time || ''}</p>
+              <p class="booking-location"><i class="fas fa-map-marker-alt"></i> ${b.location || ''}</p>
+              <div style="margin-top:8px; display:flex; gap:8px;">
+                <button class="btn btn-danger" onclick="deleteBooking('${b.id}')">Delete</button>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error('Error loading bookings:', err);
+        showNotification('Error loading bookings:', 'error')
+      }
+    }
+
+    renderBookings();
+
+    // Delete a booking by id
+    window.deleteBooking = async function (id) {
+      if (!id){
+        alert('No booking selected');
+        return;
+      }
+      if (!confirm('Delete this booking?')){
+         return;
+      }
+      try {
+        const bookingRef = doc(db, 'bookings', id);
+        await deleteDoc(bookingRef);
+        // alert('Booking deleted');
+        showNotification('Booking deleted', 'success')
+        await renderBookings();
+      } catch (err) {
+        console.error('Delete failed:', err);
+        // alert('Failed to delete booking. See console for details.');
+        showNotification('Failed to delete booking', 'error')
+      }
+    }
+
+    // Delete an event by id
+    window.deleteEvent = async function (id) {
+      if (!id){
+        alert('No event selected');
+        return;
+      }
+      if (!confirm('Delete this event? This will remove it for all users.')){
+         return;
+      }
+      try {
+        const eventRef = doc(db, 'events', id);
+        await deleteDoc(eventRef);
+        showNotification('Event deleted', 'success');
+        await renderEvents();
+      } catch (err) {
+        console.error('Delete event failed:', err);
+        showNotification('Failed to delete event', 'error');
+      }
+    }
+
+    function showNotification(message, type = "info") {
+                // Create notification element
+                const notification = document.createElement("div");
+                notification.className = `notification notification-${type}`;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 1rem 1.5rem;
+                    background: ${type === "success"
+                        ? "#10b981"
+                        : type === "error"
+                            ? "#ef4444"
+                            : "#6366f1"
+                    };
+                    color: white;
+                    border-radius: 8px;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                    z-index: 3000;
+                    animation: slideIn 0.3s;
+    `;
+                notification.textContent = message;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = "slideOut 0.3s";
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+</script>
+</html>
