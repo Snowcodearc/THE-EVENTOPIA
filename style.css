@@ -784,7 +784,9 @@ h2{
     .booking-actions .btn {
         flex: 1;
     }
-
+    .introContent{
+        margin-top: 100px;
+    }
     .introHeader .links{
         display: none;
     }
