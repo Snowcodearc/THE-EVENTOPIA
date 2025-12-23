@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvenTopia</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="header">
+        <!-- <img class="logo" src="./Images/efe1d321-4a66-4b7d-91e2-3bae24ecadab_removalai_preview.png" alt="">
+        <h1>The EvenTopia</h1> -->
+        <a href="./index.html"><svg width="220" height="60" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg">
+            <!-- Icon -->
+            <rect x="0" y="5" rx="10" ry="10" width="50" height="50" fill="#4CAF50" />
+        
+            <!-- Calendar top rings -->
+            <rect x="12" y="0" width="6" height="10" rx="3" fill="#2E7D32" />
+            <rect x="32" y="0" width="6" height="10" rx="3" fill="#2E7D32" />
+        
+            <!-- Location pin -->
+            <path d="M25 18
+               C19 18 15 22 15 27
+               C15 34 25 42 25 42
+               C25 42 35 34 35 27
+               C35 22 31 18 25 18Z" fill="#ffffff" />
+        
+            <!-- Text -->
+            <text x="65" y="38" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="600" fill="#4CAF50">
+                Eventopia
+            </text>
+            
+        </svg></a>
+
+        <button class="header-Login">Login</button>
+        <button class="header-Signup" style="display: none;">Signup</button>
+
+    </div>
+
+     <section class="Signup" id="Signup">
+        <div class="Signup-form">
+            <h2>Signup</h2>
+            <form id="signup-form">
+                <label for="signup-username">Username:</label>
+                <input type="text" id="signup-username" name="signup-username"><br><br>
+                <label for="email">UserEmail:</label>
+                <input type="email" id="email" name="email"><br><br>
+                <label for="signup-password">Password:</label>
+                <input type="password" id="password" name="password"><br><br>
+                <div  id="photoUrlGroup">
+                        <label for="photoUrl">PFP (optional)</label>
+                        <input type="url" id="photoUrl" placeholder="https://example.com/photo.jpg">
+                </div>
+                <p id="Fill-alert"></p>
+
+                 <div class="nav">
+                    <!-- <button id="Signup-Login">Login</button> -->
+                    <button id="Signup-Signup" type="submit">Register</button>
+                 </div>
+            </form>
+           
+        </div>
+    </section>
+
+    <div class="form" id="Login-form">
+        <h2>Login</h2>
+        <form id="Login-Form">
+           <label for="login-email">UserEmail:</label>
+                <input type="email" id="login-email" name="email"><br><br>
+            <label for="login-password">Password:</label>
+            <input type="password" id="login-password" name="password"><br><br>
+            <p id="Fill-alert-Login"></p>
+
+            <div class="nav">
+                <!-- <button id="Login-Signup">Signup</button> -->
+                <button id="Login-Login">Login</button>
+            </div>
+        </form>
+            
+    </div>
+    
+
+   
+
+</body>
+<script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAuj63e1bf_Xo0OhfqNIPdodgaF5BaeTJU",
+            authDomain: "eventopia-72d01.firebaseapp.com",
+            projectId: "eventopia-72d01",
+            storageBucket: "eventopia-72d01.firebasestorage.app",
+            messagingSenderId: "314849744152",
+            appId: "1:314849744152:web:1843a84ad2d7b6a7777a6d"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+
+        const db = getFirestore();
+        const colRef = collection(db, 'userDetails');
+
+        //  signup and login forms
+        const signupSection = document.getElementById('Signup');
+        const loginForm = document.getElementById('Login-form');
+        const signupLoginBtn = document.getElementById('Signup-Login');
+        const loginSignupBtn = document.getElementById('Login-Signup');
+        const headerLogin = document.querySelector('.header-Login');
+        const headerSignup = document.querySelector('.header-Signup');
+        
+        headerLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            signupSection.style.display = 'none';
+            loginForm.style.display = 'block';
+            headerLogin.style.display = 'none';
+            headerSignup.style.display = 'block';
+        });
+        headerSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.style.display = 'none';
+            signupSection.style.display = 'block';
+            headerSignup.style.display = 'none';
+            headerLogin.style.display = 'block';
+        });
+
+        // loginSignupBtn.addEventListener('click', (e) => {
+        //     e.preventDefault();
+        //     loginForm.style.display = 'none';
+        //     signupSection.style.display = 'block';
+        // });
+
+        const signUpForm = document.getElementById('signup-form');
+
+
+        signUpForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            let userName = signUpForm['signup-username'].value;
+            let userEmail = signUpForm['email'].value;
+            let userPassword = signUpForm['password'].value;
+            let fillAlert = document.getElementById('Fill-alert');
+
+            if (!userName || !userEmail || !userPassword) {
+                // fillAlert.textContent = 'Please fill all fields';
+                // fillAlert.style.color = 'red';
+                showNotification('Please fill all fields', 'error');
+                return;
+            }if(userPassword.length < 6){
+                // fillAlert.textContent = 'Password should be at least 6 characters';
+                // fillAlert.style.color = 'red';
+                showNotification('Password should be at least 6 characters', 'error');
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, userEmail, userPassword);
+                // This gets the photo URL from the form and set it on the auth profile (optional)
+                const photoUrlValue = signUpForm['photoUrl'] ? signUpForm['photoUrl'].value : null;
+                if (photoUrlValue) {
+                    try {
+                        await updateProfile(userCredential.user, { photoURL: photoUrlValue });
+                    } catch (err) {
+                        console.log('Failed to update profile photoURL:', err.message);
+                        showNotification('Failed to set profile photo URL', 'error');
+                    }
+                }
+                const userSnapShot = await addDoc(colRef, {
+                    uid: userCredential.user.uid,
+                    username: userName,
+                    email: userEmail,
+                    password: userPassword,
+                    photoUrl: photoUrlValue || null
+                })
+
+                // console.log(userCredential);
+                // console.log(userSnapShot);
+
+                // alert('Sign Up successful')
+                showNotification('Sign Up successful', 'success');
+
+                window.location.href = "./Planner.html"
+
+
+
+            } catch (error) {
+                console.log(error.message);
+                if (error.message === 'Firebase: Error (auth/email-already-in-use).') {
+                    // alert('Email already in use');
+                    showNotification('Email already in use', 'error');
+                }
+            }
+        })
+
+        const loginFormElement = document.getElementById('Login-Form');
+        loginFormElement.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            let userEmail = loginFormElement['email'].value;
+            let userPassword = loginFormElement['password'].value;
+
+            let fillAlertLogin = document.getElementById('Fill-alert-Login');
+            if (!userEmail || !userPassword) {
+                // fillAlertLogin.textContent = 'Please fill all fields';
+                // fillAlertLogin.style.color = 'red';
+                showNotification('Please fill all fields', 'error');
+                return;
+            }
+
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, userEmail, userPassword);
+                console.log(userCredential);
+
+                // alert('Login successful')
+                showNotification('Login successful', 'success');
+                window.location.href = "./Planner.html"
+
+
+
+            } catch (error) {
+                console.log(error.message);
+                if (error.message === 'Firebase: Error (auth/wrong-password).') {
+                    // fillAlertLogin.textContent = 'Wrong password';
+                    // fillAlertLogin.style.color = 'red';
+                    showNotification('Wrong password or email. Please try again.', 'error');
+                } else if (error.message === 'Firebase: Error (auth/invalid-credential).') {
+                    // fillAlertLogin.textContent = 'Invalid credentials';
+                    // fillAlertLogin.style.color = 'red';
+                    showNotification('Invalid credentials. Please try again.');
+                } else if (error.message === 'Firebase: Error (auth/user-not-found).') {
+                    // fillAlertLogin.textContent = 'User not found';
+                    // fillAlertLogin.style.color = 'red';
+                    showNotification('User not found. Please sign up first.');
+                }
+
+            }
+        })
+
+            function showNotification(message, type = "info") {
+                // Create notification element
+                const notification = document.createElement("div");
+                notification.className = `notification notification-${type}`;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 1rem 1.5rem;
+                    background: ${type === "success"
+                        ? "#10b981"
+                        : type === "error"
+                            ? "#ef4444"
+                            : "#6366f1"
+                    };
+                    color: white;
+                    border-radius: 8px;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                    z-index: 3000;
+                    animation: slideIn 0.3s;
+    `;
+                notification.textContent = message;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = "slideOut 0.3s";
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+</script>
+
+</html>

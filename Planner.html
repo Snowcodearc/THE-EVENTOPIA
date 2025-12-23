@@ -201,8 +201,13 @@
     const updateLocationInput = document.getElementById("updateLocation");
     const updateDateInput = document.getElementById("updateDate");
     const updateTimeInput = document.getElementById("updateTime");
-    let Events = [];
     const logoutBtn = document.getElementById("logoutBtn");
+    
+    // ARRAY
+    let Events = [];
+
+
+    //EVENTS
 
     createEventForm.addEventListener("submit", async (e)=> {
         e.preventDefault();
@@ -299,14 +304,20 @@
 
     logoutBtn.addEventListener("click", async(e) => {
       e.preventDefault();
+      if (!confirm('Are you sure you want to log out?')){
+         return;
+      }
       try {
         await auth.signOut();
         showNotification("Logged out successfully", 'success');
         window.location.href = "./index.html";
+
       } catch (error) {
         console.log(error.message);
+        showNotification("Error logging out", 'error')
       }
     })
+
     renderEvents();
 
     
@@ -326,14 +337,20 @@
 
     // Modal close handlers
     const modalClose = updateEventModal.querySelector('.close');
-    if (modalClose) modalClose.addEventListener('click', () => updateEventModal.style.display = 'none');
-    window.addEventListener('click', (e) => { if (e.target === updateEventModal) updateEventModal.style.display = 'none'; });
+    if (modalClose) 
+      modalClose.addEventListener('click', () => updateEventModal.style.display = 'none');
+    window.addEventListener('click', (e) => { 
+      if (e.target === updateEventModal) 
+      updateEventModal.style.display = 'none'; });
 
     // Handle update form submit
     updateEventForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = updateEventIdInput.value;
-      if (!id) return alert('No event selected');
+      if (!id){
+        alert('No event selected')
+        return;
+      } 
       try {
         const eventRef = doc(db, 'events', id);
         await updateDoc(eventRef, {

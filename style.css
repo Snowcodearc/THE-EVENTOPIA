@@ -1,25 +1,179 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; disables vertical and horizontal scroll
+}
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #f5f5f5;
-    background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+    background-image: url(https://cdn.dribbble.com/userupload/20502447/file/original-96ca9272a60aea9b49505708a54885da.gif);
+}
+svg:hover{
+    cursor: pointer;
+    transform: matrix(1.1, 0, 0, 1.1, 0, 0);
 }
 h2{
     text-align: center;
     margin-top: 10px;
     color: #333;
 }
-.header {
+.introBody{
+    background:-moz-repeating-linear-gradient()
+}
+.introHeader{
+    background-color: transparent;
+    color: #240606;
+    padding: 15px;
+    /* text-align: center; */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    display: flex;
+    /* justify-content: center; */
+}
+.introHeader svg{
+    width: 150px;
+    height: auto;
+    position: relative;
+    left: 50px;
+}
+.introHeader .links{
+    margin-left: auto;
+    margin-right: 320px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+.introHeader .links a{
+    text-decoration: none;
+    color: #240606;
+    font-weight: 500;
+    font-size: 16px;
+}
+.introHeader .links a:hover{
+    color: #4CAF50;
+    text-decoration: underline;
+}
+.introHeader .startButton{
+    margin-left: 20px;
+    margin-right: 50px;
+}
+.introHeader .startButton button{
+    padding: 8px 16px;
     background-color: #4CAF50;
     color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.introContent{
+    text-align: center;
+    margin-top: 150px;
+    color: #240606;
+    background-blend-mode: color-dodge;
+    border-radius: 4px;
+    border: #10b981;
+    z-index: 1000;
+}
+.introContent svg{
+    width: 200px;
+    height: auto;
+    z-index: 1000;
+}
+.introBody .image-one{
+    width: 400px;
+    height: auto;
+    position: relative;
+    bottom: 500px;
+    left: 980px;
+    z-index: -500;
+}   
+.introBody .image-two{
+    width: 400px;
+    height: auto;
+    position: relative;
+    bottom: 300px;
+    right: 500px;
+    /* z-index: -500; */
+}   
+.introContent h1{
+    font-size: 50px;
+    /* margin-bottom: 0px; */
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    
+}
+.introContent h2{
+    font-size: 48px;
+    margin-bottom: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    color: #6b7280;
+    position: relative;
+    bottom: 15px;
+    z-index: 1000;
+}
+.introContent p{
+    font-size: 20px;
+    margin-bottom: 30px;
+    color: #555;
+    z-index: 1000;
+}
+.introContent button{
+    padding: 12px 24px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 1000;
+}
+.header {
+    color: #240606;
+    background-color: ;
     padding: 15px;
     text-align: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    /* max-width: 100%;
+    max-height: 100%;
+    height: auto; */
+    height: 5%;
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.header svg{
+    width: 150px;
+    height: auto;
+    position: relative;
+    left: auto;
+    left: 50px;
+}
+.header button{
+    position: relative;
+    right: 50px;
+    /* right: auto; */
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
 }
 .form{
     max-width: 400px;
@@ -36,6 +190,7 @@ h2{
     justify-content: center;
     position: relative;
     left: 40px;
+
 }
 .form form label{
     /* display: block; */
@@ -56,13 +211,16 @@ h2{
 }
 .form button{
     width: 20%;
-    padding: 2px;
+    padding: 10px;
     background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
+    width: 80%;
+    position: relative;
+    right: 35px;
 }
 
 
@@ -97,14 +255,18 @@ h2{
     border-radius: 4px;
 }
 .Signup button{
-    width: 20%;
-    /* padding: 2px; */
+    /* width: 20%; */
+    padding: 10px; 
     background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
+    width: 80%;
+    position: relative;
+    right: 35px;
+
 }
 :root {
     --primary-color: #4CAF50;
@@ -622,6 +784,22 @@ h2{
     .booking-actions .btn {
         flex: 1;
     }
+
+    .introHeader .links{
+        display: none;
+    }
+    .introHeader svg{
+        left: 20px;
+    }
+    .introHeader .startButton{
+        margin-left: 80px;
+    }
+    .introBody .image-one{
+        display: none;
+    }   
+    .introBody .image-two{
+        display: none;
+    }   
 }
 
 
