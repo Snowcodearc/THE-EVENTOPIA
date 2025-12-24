@@ -5,7 +5,7 @@
     padding: 0;
     box-sizing: border-box;
 }
-html, .introBody {
+.introBody {
     height: 100%;
     margin: 0;
     overflow: hidden; /*disables vertical and horizontal scroll*/
